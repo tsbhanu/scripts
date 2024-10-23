@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Prompt user for database host and port
+read -p "Enter the database host (e.g., localhost or IP address): " DB_HOST
+read -p "Enter the database port (default is 1433): " DB_PORT
+
+# Set default port if not provided
+DB_PORT=${DB_PORT:-1433}
+
+# Check if nc (netcat) is installed
+if ! command -v nc &> /dev/null; then
+    echo "nc (netcat) is not installed. Please install it to proceed."
+    exit 1
+fi
+
+# Function to check connectivity
+check_connectivity() {
+    nc -z -v "$DB_HOST" "$DB_PORT"
+    if [ $? -eq 0 ]; then
+        echo "Successfully connected to $DB_HOST on port $DB_PORT."
+    else
+        echo "Failed to connect to $DB_HOST on port $DB_PORT."
+    fi
+}
+
+# Execute the connectivity check
+check_connectivity
+

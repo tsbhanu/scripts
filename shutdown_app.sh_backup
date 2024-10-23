@@ -1,0 +1,43 @@
+#!/bin/bash
+# Function to shutdown app on remote server
+shutdown_app_remote() {
+    local server="$1"
+    local app_name="$2"
+    local signal="SIGTERM"
+
+    echo "Connecting to $server..."
+
+    # Find the process ID (PID) of the application
+    PID=$(ssh "$server" "pgrep -f '$app_name'")
+
+    if [ -z "$PID" ]; then
+        echo "No running instance of $app_name found on $server."
+        return
+    fi
+
+    echo "Sending $signal to $app_name with PID $PID on $server..."
+    ssh "$server" "kill -$signal $PID"
+
+    # Wait for the process to terminate
+    echo "Waiting for $app_name to shut down gracefully on $server..."
+    ssh "$server" "wait $PID 2>/dev/null"
+
+    if ssh "$server" "ps -p $PID > /dev/null"; then
+        echo "$app_name did not shut down gracefully on $server. Forcing shutdown..."
+        ssh "$server" "kill -9 $PID"  # Force kill if it doesn't shut down
+    else
+        echo "$app_name has shut down gracefully on $server."
+    fi
+}
+
+# Prompt user for input
+read -p "Enter the application name to shut down: " APP_NAME
+
+# Prompt user for the list of remote servers
+read -p "Enter remote server addresses (space-separated): " -a REMOTE_SERVERS
+
+# Loop through the list of remote servers and shutdown the app
+for server in "${REMOTE_SERVERS[@]}"; do
+    shutdown_app_remote "$server" "$APP_NAME"
+done
+
