@@ -1,42 +1,35 @@
 #!/bin/bash
 
-# Function to start multiple services on a server
-start_services() {
+# Function to start a service on a remote server
+start_service() {
     local server=$1
-    local user=$2
-    shift 2
-    local services=("$@")
+    local service=$2
 
-    echo "Starting services on $server..."
+    echo "Starting service '$service' on server '$server'..."
 
-    for service in "${services[@]}"; do
-        echo "Attempting to start $service on $server..."
+    # SSH into the server and start the service using systemctl
+    ssh "$server" "sudo systemctl start $service" &> /dev/null
 
-        # SSH into the server and start the service
-        ssh "$user@$server" "sudo systemctl start $service" &>/dev/null
-
-        if [[ $? -eq 0 ]]; then
-            echo "Successfully started $service on $server."
-        else
-            echo "Failed to start $service on $server."
-        fi
-    done
+    if [[ $? -eq 0 ]]; then
+        echo "Service '$service' on server '$server' has been started."
+    else
+        echo "Failed to start service '$service' on server '$server' or service not found."
+    fi
 }
 
-# Prompt user for a list of servers
-echo "Enter the list of servers (separated by spaces):"
+# Prompt user for server input
+echo "Please enter the server addresses (space-separated):"
 read -r -a servers
 
-# Prompt user for the username to use for SSH
-echo "Enter the SSH username:"
-read -r ssh_user
-
-# Prompt user for the list of services to start
-echo "Enter the names of the services you want to start (separated by spaces):"
+# Prompt user for service input
+echo "Please enter the service names you want to start (space-separated):"
 read -r -a services
 
-# Loop through each server and start the services
+# Iterate through each server
 for server in "${servers[@]}"; do
-    start_services "$server" "$ssh_user" "${services[@]}"
+    # Iterate through each service
+    for service in "${services[@]}"; do
+        start_service "$server" "$service"
+    done
 done
 
