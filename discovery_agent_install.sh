@@ -17,10 +17,6 @@ then
     sudo yum install aws-cli -y
 fi
 
-# Update the system packages
-echo "Updating system packages..."
-sudo yum update -y
-
 # Install wget if not already installed
 if ! command -v wget &> /dev/null
 then
