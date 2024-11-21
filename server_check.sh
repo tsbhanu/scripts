@@ -4,7 +4,7 @@
 read -p "Enter server addresses separated by spaces: " -a servers  # Read into an array
 
 # Prompt the user for timeout duration, with a default of 2 seconds
-#read -p "Enter the timeout duration in seconds (default is 2): " timeout
+read -p "Enter the timeout duration in seconds (default is 2): " timeout
 timeout=${timeout:-2}  # Use default of 2 if no input is given
 
 # Function to check connectivity

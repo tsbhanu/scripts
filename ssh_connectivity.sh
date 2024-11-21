@@ -8,7 +8,7 @@ read -r -a SERVERS  # Read input into an array
 read -p "Enter the SSH username: " USERNAME
 
 # Optional: Prompt for SSH key location
-read -p "Enter the SSH key file location (press Enter to use default ~/.ssh/id_rsa): " SSH_KEY
+#read -p "Enter the SSH key file location (press Enter to use default ~/.ssh/id_rsa): " SSH_KEY
 SSH_KEY=${SSH_KEY:-~/.ssh/id_rsa}  # Use default if none provided
 
 # Function to test SSH connection
